@@ -93,4 +93,26 @@ test.describe("Authentication", () => {
       page.getByText("You have been logged out. Please log in.")
     ).toBeVisible();
   });
+
+  test("login with invalid username should display error message", async ({
+    page,
+  }) => {
+    await navigateToLogin(page);
+
+    await performLogin(page, "invaliduser", CREDENTIALS.valid.password);
+
+    await expect(page.getByText("User not found!")).toBeVisible();
+  });
+
+  test("login with invalid password should display error message", async ({
+    page,
+  }) => {
+    await navigateToLogin(page);
+
+    await performLogin(page, CREDENTIALS.valid.username, "wrongpassword");
+
+    await expect(
+      page.getByText("Incorrect username or password!")
+    ).toBeVisible();
+  });
 });
