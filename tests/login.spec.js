@@ -59,6 +59,10 @@ test.describe("Authentication", () => {
       CREDENTIALS.valid.password
     );
 
+    await expect(
+      page.getByText("User successfully logged in! Redirecting...")
+    ).toBeVisible();
+
     await expect(page.getByText("User test authenticated")).toBeVisible();
   });
 
