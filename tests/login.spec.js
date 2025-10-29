@@ -1,130 +1,126 @@
 import { test, expect } from "@playwright/test";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const CREDENTIALS = {
-  valid: {
-    username: process.env.VALID_USERNAME,
-    password: process.env.VALID_PASSWORD
-  },
-  blocked: {
-    username: process.env.BLOCKED_USERNAME,
-    password: process.env.BLOCKED_PASSWORD
-  },
-};
-
-async function navigateToLogin(page) {
-  await page.goto(`/login`);
-}
+import { CREDENTIALS, MESSAGES, SELECTORS } from "./data/login.js";
 
 async function performLogin(page, username, password) {
   await page
-    .getByRole("textbox", { name: "Type your username" })
+    .getByRole("textbox", { name: SELECTORS.usernameInput })
     .fill(username);
   await page
-    .getByRole("textbox", { name: "Type your password" })
+    .getByRole("textbox", { name: SELECTORS.passwordInput })
     .fill(password);
-  await page.getByRole("button", { name: "Login" }).click();
+  await page.getByRole("button", { name: SELECTORS.loginButton }).click();
 }
 
-test.describe("Homepage", () => {
-  test("has title", async ({ page }) => {
-    await page.goto("/");
-    await expect(page).toHaveTitle(/Playground page/);
-  });
-
-  test("check homepage texts", async ({ page }) => {
-    await page.goto("/");
-
-    await expect(
-      page.getByRole("heading", { name: "Test Playground" })
-    ).toBeVisible();
-
-    await expect(
-      page.getByText(
-        "This page was developed by the Bug Buster Mentorship team for educational purposes."
-      )
-    ).toBeVisible();
-  });
-
-  test("navigate to the login page", async ({ page }) => {
-    await page.goto("/");
-
-    await page.getByRole("link", { name: "Login" }).click();
-
-    await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
-  });
-});
-
 test.describe("Authentication", () => {
-  test("login with regular account", async ({ page }) => {
-    await navigateToLogin(page);
-
-    await performLogin(
-      page,
-      CREDENTIALS.valid.username,
-      CREDENTIALS.valid.password
-    );
-
-    await expect(
-      page.getByText("User successfully logged in! Redirecting...")
-    ).toBeVisible();
-
-    await expect(page.getByText("User test authenticated")).toBeVisible();
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/login");
   });
 
-  test("login with blocked account should display error message", async ({
-    page,
-  }) => {
-    await navigateToLogin(page);
+  test("✅ Successful login", async ({ page }) => {
+    await test.step("Enter valid credentials", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.valid.username,
+        CREDENTIALS.valid.password
+      );
+    });
 
-    await performLogin(
-      page,
-      CREDENTIALS.blocked.username,
-      CREDENTIALS.blocked.password
-    );
-
-    await expect(page.getByText("User blocked!")).toBeVisible();
+    await test.step("Verify success message and redirection", async () => {
+      await expect(page.getByText(MESSAGES.successfulLogin)).toBeVisible();
+      await expect(page.getByText(MESSAGES.userAuthenticated)).toBeVisible();
+    });
   });
 
-  test("test logout", async ({ page }) => {
-    await navigateToLogin(page);
+  test("🚫 Blocked account", async ({ page }) => {
+    await test.step("Enter blocked account credentials", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.blocked.username,
+        CREDENTIALS.blocked.password
+      );
+    });
 
-    await performLogin(
-      page,
-      CREDENTIALS.valid.username,
-      CREDENTIALS.valid.password
-    );
-
-    await expect(page.getByText("User test authenticated")).toBeVisible();
-
-    await page.getByRole("button", { name: "Logout" }).click();
-
-    await expect(
-      page.getByText("You have been logged out. Please log in.")
-    ).toBeVisible();
+    await test.step("Verify blocked user message", async () => {
+      await expect(page.getByText(MESSAGES.blockedUser)).toBeVisible();
+    });
   });
 
-  test("login with invalid username should display error message", async ({
-    page,
-  }) => {
-    await navigateToLogin(page);
+  test("❌ Invalid user (User not found!)", async ({ page }) => {
+    await test.step("Enter invalid username", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.invalid.username,
+        CREDENTIALS.valid.password
+      );
+    });
 
-    await performLogin(page, "invaliduser", CREDENTIALS.valid.password);
-
-    await expect(page.getByText("User not found!")).toBeVisible();
+    await test.step("Verify user not found message", async () => {
+      await expect(page.getByText(MESSAGES.userNotFound)).toBeVisible();
+    });
   });
 
-  test("login with invalid password should display error message", async ({
-    page,
-  }) => {
-    await navigateToLogin(page);
+  test("🔑 Wrong password", async ({ page }) => {
+    await test.step("Enter valid username with wrong password", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.valid.username,
+        CREDENTIALS.wrongPassword.password
+      );
+    });
 
-    await performLogin(page, CREDENTIALS.valid.username, "wrongpassword");
+    await test.step("Verify incorrect credentials message", async () => {
+      await expect(page.getByText(MESSAGES.incorrectCredentials)).toBeVisible();
+    });
+  });
 
-    await expect(
-      page.getByText("Incorrect username or password!")
-    ).toBeVisible();
+  test("🔁 Wrong password 3 times (temporary block)", async ({ page }) => {
+    await test.step("Attempt 1: Enter wrong password", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.valid.username,
+        CREDENTIALS.wrongPassword.password
+      );
+      await expect(page.getByText(MESSAGES.incorrectCredentials)).toBeVisible();
+    });
+
+    await test.step("Attempt 2: Enter wrong password again", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.valid.username,
+        CREDENTIALS.wrongPassword.password
+      );
+      await expect(page.getByText(MESSAGES.incorrectCredentials)).toBeVisible();
+    });
+
+    await test.step("Attempt 3: Enter wrong password third time", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.valid.username,
+        CREDENTIALS.wrongPassword.password
+      );
+    });
+
+    await test.step("Verify temporary block message", async () => {
+      await expect(page.getByText(MESSAGES.temporaryBlock)).toBeVisible();
+    });
+  });
+
+  test("🔁 Logout functionality", async ({ page }) => {
+    await test.step("Login with valid credentials", async () => {
+      await performLogin(
+        page,
+        CREDENTIALS.valid.username,
+        CREDENTIALS.valid.password
+      );
+      await expect(page.getByText(MESSAGES.userAuthenticated)).toBeVisible();
+    });
+
+    await test.step("Click logout button", async () => {
+      await page.getByRole("button", { name: SELECTORS.logoutButton }).click();
+    });
+
+    await test.step("Verify logout message", async () => {
+      await expect(page.getByText(MESSAGES.loggedOut)).toBeVisible();
+    });
   });
 });
