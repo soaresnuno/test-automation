@@ -1,13 +1,21 @@
 import { test, expect } from "@playwright/test";
+import dotenv from "dotenv";
 
-const BASE_URL = "https://playground-drab-six.vercel.app";
+dotenv.config();
+
 const CREDENTIALS = {
-  valid: { username: "test", password: "password123" },
-  blocked: { username: "testblock", password: "password123" },
+  valid: {
+    username: process.env.VALID_USERNAME,
+    password: process.env.VALID_PASSWORD
+  },
+  blocked: {
+    username: process.env.BLOCKED_USERNAME,
+    password: process.env.BLOCKED_PASSWORD
+  },
 };
 
 async function navigateToLogin(page) {
-  await page.goto(`${BASE_URL}/login`);
+  await page.goto(`/login`);
 }
 
 async function performLogin(page, username, password) {
@@ -22,12 +30,12 @@ async function performLogin(page, username, password) {
 
 test.describe("Homepage", () => {
   test("has title", async ({ page }) => {
-    await page.goto(BASE_URL);
+    await page.goto("/");
     await expect(page).toHaveTitle(/Playground page/);
   });
 
   test("check homepage texts", async ({ page }) => {
-    await page.goto(BASE_URL);
+    await page.goto("/");
 
     await expect(
       page.getByRole("heading", { name: "Test Playground" })
@@ -41,7 +49,7 @@ test.describe("Homepage", () => {
   });
 
   test("navigate to the login page", async ({ page }) => {
-    await page.goto(BASE_URL);
+    await page.goto("/");
 
     await page.getByRole("link", { name: "Login" }).click();
 
