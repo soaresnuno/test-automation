@@ -15,10 +15,14 @@ export class RegistrationPage {
     this.nameInput = page.getByPlaceholder(SELECTORS.nameInput);
     this.emailInput = page.getByPlaceholder(SELECTORS.emailInput);
     this.passwordInput = page.getByPlaceholder(SELECTORS.passwordInput);
-    this.countrySelect = page.locator(`select[name="${SELECTORS.countrySelect}"]`);
+    this.countrySelect = page.locator(
+      `select[name="${SELECTORS.countrySelect}"]`
+    );
 
     // Buttons
-    this.submitButton = page.getByRole("button", { name: SELECTORS.submitButton });
+    this.submitButton = page.getByRole("button", {
+      name: SELECTORS.submitButton,
+    });
 
     // Messages
     this.successMessage = page.getByText(MESSAGES.successfulRegistration);

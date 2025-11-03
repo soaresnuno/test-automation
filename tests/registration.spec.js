@@ -2,8 +2,8 @@ import { test, expect } from "./fixtures/registrationFixtures.js";
 import { FORM_DATA, HOBBIES } from "./data/registration.js";
 
 test.describe("Registration Flow", () => {
-  test.describe("Successful Registration", () => {
-    test("✅ Complete registration with all required fields", async ({
+  test.describe("✅ Successful Registration", () => {
+    test("Complete registration with all required fields", async ({
       registrationPage,
     }) => {
       await test.step("Fill in all required fields", async () => {
@@ -19,7 +19,7 @@ test.describe("Registration Flow", () => {
       });
     });
 
-    test("✅ Registration with minimal required fields (no hobbies)", async ({
+    test("Registration with minimal required fields (no hobbies)", async ({
       registrationPage,
     }) => {
       await test.step("Fill only required fields without hobbies", async () => {
@@ -35,7 +35,7 @@ test.describe("Registration Flow", () => {
       });
     });
 
-    test("✅ Registration with all hobbies selected", async ({
+    test("Registration with all hobbies selected", async ({
       registrationPage,
     }) => {
       await test.step("Fill all fields including all hobbies", async () => {
@@ -51,7 +51,7 @@ test.describe("Registration Flow", () => {
       });
     });
 
-    test("✅ Verify all hobby checkboxes are selectable", async ({
+    test("Verify all hobby checkboxes are selectable", async ({
       registrationPage,
     }) => {
       await test.step("Select each hobby checkbox", async () => {
@@ -84,7 +84,7 @@ test.describe("Registration Flow", () => {
   });
 
   test.describe("Form Field Interactions", () => {
-    test("🔄 Verify all gender radio buttons work correctly", async ({
+    test("Verify all gender radio buttons work correctly", async ({
       registrationPage,
     }) => {
       await test.step("Select Male gender", async () => {
@@ -112,7 +112,7 @@ test.describe("Registration Flow", () => {
       });
     });
 
-    test("🔄 Verify hobby checkboxes can be toggled", async ({
+    test("Verify hobby checkboxes can be toggled", async ({
       registrationPage,
     }) => {
       await test.step("Check and uncheck a hobby", async () => {
@@ -126,7 +126,7 @@ test.describe("Registration Flow", () => {
       });
     });
 
-    test("🔄 Verify country dropdown displays all options", async ({
+    test("Verify country dropdown displays all options", async ({
       registrationPage,
     }) => {
       await test.step("Check all country options are present", async () => {
