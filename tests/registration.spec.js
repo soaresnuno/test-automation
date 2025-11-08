@@ -2,7 +2,7 @@ import { test, expect } from "./fixtures/registrationFixtures.js";
 import { FORM_DATA, HOBBIES } from "./data/registration.js";
 
 test.describe("Registration Flow", () => {
-  test.describe("✅ Successful Registration", () => {
+  test.describe("Successful Registration", () => {
     test("Complete registration with all required fields", async ({
       registrationPage,
     }) => {
