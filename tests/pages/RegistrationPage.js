@@ -5,9 +5,6 @@ import { SELECTORS, MESSAGES } from "../data/registration.js";
  * Page Object Model for the Registration Page
  */
 export class RegistrationPage {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
   constructor(page) {
     this.page = page;
 

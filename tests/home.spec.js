@@ -1,38 +1,41 @@
-import { test, expect } from "@playwright/test";
-import { HOMEPAGE, NAVIGATION } from "./data/home.js";
+import { test } from "@playwright/test";
+import { HomePage } from "./pages/HomePage.js";
 
 test.describe("Homepage", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    const homePage = new HomePage(page);
+    await homePage.goto();
   });
 
   test("has title", async ({ page }) => {
+    const homePage = new HomePage(page);
+
     await test.step("Verify page title", async () => {
-      await expect(page).toHaveTitle(HOMEPAGE.title);
+      await homePage.verifyTitle();
     });
   });
 
   test("check homepage texts", async ({ page }) => {
+    const homePage = new HomePage(page);
+
     await test.step("Verify main heading is visible", async () => {
-      await expect(
-        page.getByRole("heading", { name: HOMEPAGE.heading })
-      ).toBeVisible();
+      await homePage.verifyMainHeading();
     });
 
     await test.step("Verify description text is visible", async () => {
-      await expect(page.getByText(HOMEPAGE.description)).toBeVisible();
+      await homePage.verifyDescription();
     });
   });
 
   test("navigate to the login page", async ({ page }) => {
+    const homePage = new HomePage(page);
+
     await test.step("Click on Login link", async () => {
-      await page.getByRole("link", { name: NAVIGATION.loginLink }).click();
+      await homePage.clickLoginLink();
     });
 
     await test.step("Verify redirected to login page", async () => {
-      await expect(
-        page.getByRole("heading", { name: NAVIGATION.loginHeading })
-      ).toBeVisible();
+      await homePage.verifyLoginPageRedirect();
     });
   });
 });
